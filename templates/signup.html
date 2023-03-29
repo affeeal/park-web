@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ask</title>
+  <title>Sign up</title>
   <link rel="shortcut icon" type="image/x-icon" href="../static/img/logo.png">
   <link href="../static/css/bootstrap.css" rel="stylesheet">
   <link href="../static/css/style.css" rel="stylesheet">
@@ -32,46 +32,74 @@
   <main class="container">
     <div class="row">
       <div class="col-8">
-        <h2>New question</h2>
+        <h2>Sign up</h2>
+        <p class="text-danger mt-3">Sorry, this email address is already used!</p>
         <form class="needs-validation mt-3" novalidate>
           <div class="row">
-            <div class="col-1">
-              <label for="title" class="col-form-label">Title</label>
+            <div class="col-3">
+              <label for="login" class="col-form-label">Login</label>
             </div>
-            <div class="col-11">
-              <input class="form-control" id="title" type="text" size="100" maxlength="100" required>
-              <div class="invalid-feedback">Please enter a title</div>
-            </div>
-          </div>
-          <div class="row mt-3">
-            <div class="col-1">
-              <label for="text" class="col-form-label">Text</label>
-            </div>
-            <div class="col-11">
-              <textarea class="form-control" id="text" rows="10" required></textarea>
-              <div class="invalid-feedback">Please enter a text</div>
+            <div class="col-6">
+              <input class="form-control" id="login" type="text" size="40" maxlength="40" required> 
+              <div class="invalid-feedback">Please choose a login</div>
             </div>
           </div>
           <div class="row mt-3">
-            <div class="col-1">
-              <label for="tags" class="col-form-label">Tags</label>
+            <div class="col-3">
+              <label for="email" class="col-form-label">Email</label>
             </div>
-            <div class="col-11">
-              <input class="form-control" id="tags" type="text" aria-describedby="tags-hint" size="100" maxlength="100">
-              <small class="form-text" id="tags-hint">
-                Enter tags separated by space
-              </small>
+            <div class="col-6">
+              <input class="form-control" id="email" type="email" size="40" maxlength="40" required> 
+              <div class="invalid-feedback">Please specify an email</div>
             </div>
           </div>
-          <button class="btn btn-success mt-4" type="submit">Ask question</button>
-
+          <div class="row mt-3">
+            <div class="col-3">
+              <label for="nickname" class="col-form-label">Nickname</label>
+            </div>
+            <div class="col-6">
+              <input class="form-control" id="nickname" type="text" size="40" maxlength="40" required> 
+              <div class="invalid-feedback">Please choose a nickname</div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-3">
+              <label for="password" class="col-form-label">Password</label>
+            </div>
+            <div class="col-6">
+              <input class="form-control" id="password" type="password" size="40" maxlength="40" required>
+              <div class="invalid-feedback">Please choose a password</div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-3">
+              <label for="repeat-password" class="col-form-label">Repeat password</label>
+            </div>
+            <div class="col-6">
+              <input class="form-control" id="password" type="password" size="40" maxlength="40" required>
+              <div class="invalid-feedback">Please repeat the password</div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-3">
+              <label for="upload-avatar" class="col-form-label">Upload avatar</label>
+            </div>
+            <div class="col-6">
+              <input class="form-control" id="upload-avatar" type="file">
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-6 offset-3">
+              <button class="btn btn-success" type="submit">Sign up</button>
+            </div>
+          </div>
         </form>
       </div>
       <div class="col-3 offset-1">
         <div class="card mb-4">
           <div class="card-body">
             <h3 class="card-title">Popular tags</h3>
-            <a class="btn btn-outline-primary m-1" href="tag.html">C++</a>
+            <a class="btn btn-outline-primary m-1" href="#">C++</a>
             <a class="btn btn-outline-primary m-1" href="#">JavaScript</a>
             <a class="btn btn-outline-primary m-1" href="#">Golang</a>
             <a class="btn btn-outline-primary m-1" href="#">Python</a>
