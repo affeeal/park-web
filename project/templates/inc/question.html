@@ -1,0 +1,35 @@
+{% load static %}
+
+<div class="card mb-5 {% block question-bg %}{% endblock %}">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-2 d-flex flex-column align-items-center">
+        <input type="radio" class="btn-check" name="question-vote-{{ question.id }}" id="question-vote-up-{{ question.id }}">
+        <label class="btn btn-light" for="question-vote-up-{{ question.id }}">
+          <img src="{% static "img/chevron-up.svg" %}" alt="vote up">
+        </label>
+        {% block question-rating %}{% endblock %}
+        <input type="radio" class="btn-check" name="question-vote-{{ question.id }}" id="question-vote-down-{{ question.id }}">
+        <label class="btn btn-light" for="question-vote-down-{{ question.id }}">
+          <img src="{% static "img/chevron-down.svg" %}" alt="vote down">
+        </label>
+        {% block question-answers %}{% endblock %}
+      </div>
+      <div class="col-10 d-flex flex-column">
+        <h4 class="card-title mb-3">{% block question-title %}{% endblock %}</h4>
+        <p class="card-text flex-grow-1">{% block question-text %}{% endblock %}</p>
+        <div class="row">
+          <div class="col-9">
+            {% for tag in question.tags %}
+              {% include 'inc/tag.html' %}
+            {% endfor %}
+          </div>
+          <div class="col-3 d-flex justify-content-center align-items-center">
+            <img class="me-2 rounded-circle avatar" src="{% static "img/avatar.png" %}" alt="avatar">
+            <span>{{ question.author|truncatechars:10 }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

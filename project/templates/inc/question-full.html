@@ -1,0 +1,17 @@
+{% extends 'inc/question.html' %}
+
+{% block question-bg %}
+  bg-light
+{% endblock %}
+
+{% block question-rating %}
+  <h4 class="m-1">{{ question.rating }}</h4>
+{% endblock %}
+
+{% block question-title %}
+  <h3>{{ question.title }}</h3>
+{% endblock %}
+
+{% block question-text %}
+  {{ question.text }}
+{% endblock %}
