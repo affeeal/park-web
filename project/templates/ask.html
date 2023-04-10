@@ -1,9 +1,7 @@
 {% extends 'inc/base.html' %}
 {% load static %}
 
-{% block title %}
-  Ask
-{% endblock %}
+{% block title %} Ask {% endblock %}
 
 {% block authorization %}
   {% include 'inc/authorized.html' %}
@@ -17,8 +15,8 @@
         <label for="title" class="col-form-label">Title</label>
       </div>
       <div class="col-11">
-        <input class="form-control" id="title" type="text" size="100" maxlength="100"
-               required>
+        <input class="form-control" id="title" type="text" size="100"
+               maxlength="100" required>
       </div>
     </div>
     <div class="row mt-3">
@@ -34,8 +32,8 @@
         <label for="tags" class="col-form-label">Tags</label>
       </div>
       <div class="col-11">
-        <input class="form-control" id="tags" type="text" aria-describedby="tags-hint"
-               size="100" maxlength="100">
+        <input class="form-control" id="tags" type="text"
+               aria-describedby="tags-hint" size="100" maxlength="100">
         <small class="form-text" id="tags-hint">
           Enter tags separated by space
         </small>

@@ -31,14 +31,13 @@ def tag(request, tag_name):
 
 def question(request, question_id):
     try:
-        questions[question_id]
-    except:
-        raise Http404("Question not found")
-        
-    context = {
-        'question': questions[question_id]
-    }
-    return render(request, 'question.html', context)
+        context = {
+            'question': questions[question_id],
+        }
+    except IndexError:
+        raise Http404("Question does not exist")
+    else:
+        return render(request, 'question.html', context)
 
 
 def login(request):

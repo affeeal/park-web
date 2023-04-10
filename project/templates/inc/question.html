@@ -43,11 +43,9 @@
             {% endfor %}
           </div>
           <div class="col-3 d-flex justify-content-center align-items-center">
-            <img class="me-2 rounded-circle avatar" src="{% static "img/avatar.png" %}"
+            <img class="me-2 rounded-circle avatar" src="{% static 'img/avatar.png' %}"
                  alt="avatar">
-            <span>
-              {{ question.author|truncatechars:10 }}
-            </span>
+            <span>{{ question.author|truncatechars:10 }}</span>
           </div>
         </div>
       </div>
