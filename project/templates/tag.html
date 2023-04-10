@@ -1,9 +1,16 @@
 {% extends 'inc/base.html' %}
 
+{% block title %}
+  Tag
+{% endblock %}
+
 {% block content %}
   <div class="mb-3 d-flex align-items-center">
     <h2 class="d-inline me-3">Tag: </h2>
     {% include 'inc/tag.html' %}
   </div>
-  {# TODO: question list #}
+  {% for question in questions %}
+    {% include 'inc/question.html' %}
+  {% endfor %}
+  {# TODO: pagination #}
 {% endblock %}

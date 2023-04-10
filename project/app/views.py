@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import questions 
+from .models import hot_questions
 from .models import tags 
 
 
@@ -11,12 +12,16 @@ def index(request):
 
 
 def hot(request):
-    return render(request, 'index.html') # page to return?
+    context = {
+        'questions': hot_questions,
+    }
+    return render(request, 'index.html', context)
 
 
 def tag(request, tag_name):
     context = {
         'tag': tags[tag_name],
+        'questions': questions,
     }
     return render(request, 'tag.html', context)
 

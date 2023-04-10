@@ -4,13 +4,13 @@ questions = [
     {
         'answers': [
             {
-                'author': 'Answer author',
+                'author': 'nickname',
                 'id': j,
                 'rating': 0,
                 'text': 'Answer text',
             } for j in range(3)
         ],
-        'author': 'Question author',
+        'author': 'nickname',
         'id': i,
         'rating': 0,
         'tags': [
@@ -21,6 +21,30 @@ questions = [
         ],
         'text': 'Question text',
         'title': 'Question title',
+    } for i in range(3)
+]
+
+hot_questions = [
+    {
+        'answers': [
+            {
+                'author': 'nickname',
+                'id': j,
+                'rating': 0,
+                'text': 'Answer text',
+            } for j in range(3)
+        ],
+        'author': 'nickname',
+        'id': i,
+        'rating': 0,
+        'tags': [
+            {
+                'name': f'tag-name-{j}',
+                'usages': 0,
+            } for j in range(3)
+        ],
+        'text': 'Hot question text',
+        'title': 'Hot question title',
     } for i in range(3)
 ]
 

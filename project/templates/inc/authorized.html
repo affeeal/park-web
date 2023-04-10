@@ -1,0 +1,13 @@
+{% load static %}
+
+<div class="dropdown">
+  <span class="text-light">affeeal<span>
+  <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <img class="avatar" src="{% static "img/avatar.png" %}" alt="avatar">
+  </button>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="{% url 'settings' %}">Settings</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="">Log out</a></li>
+  </ul>
+</div>

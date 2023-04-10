@@ -11,7 +11,8 @@
     {% include 'inc/answer.html' %}
   {% endfor %}
   <form class="mt-5">
-    <textarea class="form-control" placeholder="Enter your answer here..." rows="5"></textarea>
+    <textarea class="form-control" placeholder="Enter your answer here..." rows="5"
+              required></textarea>
     <button class="btn btn-success mt-3" type="submit">Answer question</button>
   </form>
 {% endblock %}

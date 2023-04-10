@@ -1,23 +1,26 @@
 {% extends "inc/base.html" %}
 
-{% block title %} Questions {% endblock %}
+{% block title %}
+  Questions
+{% endblock %}
 
 {% block content %}
-<div class="mb-4">
-  <h2 class="d-inline">New questions</h2>
-  <a class="ms-4" href="{% url 'hot' %}">hot questions</a>
-</div>
-{% for question in questions %}
-  {% include "inc/question-cut.html" %}
-{% endfor %}
-<nav>
-  <ul class="pagination">
-    <li class="page-item">
-      <a class="page-link" href="#">Previous</a></li>
-    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-    <li class="page-item"><a class="page-link" href="#">2</a></li>
-    <li class="page-item"><a class="page-link" href="#">3</a></li>
-    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-  </ul>
-</nav>
+  <div class="mb-4">
+    <h2 class="d-inline">New questions</h2>
+    <a class="ms-4" href="{% url 'hot' %}">hot questions</a>
+  </div>
+  {% for question in questions %}
+    {% include 'inc/question.html' %}
+  {% endfor %}
+  {# TODO: pagination #}
+  <nav>
+    <ul class="pagination">
+      <li class="page-item">
+        <a class="page-link" href="#">Previous</a></li>
+      <li class="page-item active"><a class="page-link" href="#">1</a></li>
+      <li class="page-item"><a class="page-link" href="#">2</a></li>
+      <li class="page-item"><a class="page-link" href="#">3</a></li>
+      <li class="page-item"><a class="page-link" href="#">Next</a></li>
+    </ul>
+  </nav>
 {% endblock %}
