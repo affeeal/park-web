@@ -19,9 +19,9 @@ questions = [
                 'usages': 0,
             } for j in range(3)
         ],
-        'text': 'Question text',
-        'title': 'Question title',
-    } for i in range(3)
+        'text': f'Question #{i} text',
+        'title': f'Question #{i} title',
+    } for i in range(100)
 ]
 
 hot_questions = [
@@ -43,9 +43,9 @@ hot_questions = [
                 'usages': 0,
             } for j in range(3)
         ],
-        'text': 'Hot question text',
-        'title': 'Hot question title',
-    } for i in range(3)
+        'text': f'Hot question #{i} text',
+        'title': f'Hot question #{i} title',
+    } for i in range(100)
 ]
 
 tags = {

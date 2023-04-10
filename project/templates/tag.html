@@ -9,8 +9,8 @@
     <h2 class="d-inline me-3">Tag: </h2>
     {% include 'inc/tag.html' %}
   </div>
-  {% for question in questions %}
+  {% for question in page.obj %}
     {% include 'inc/question.html' %}
   {% endfor %}
-  {# TODO: pagination #}
+  {% include 'inc/pagination.html' %}
 {% endblock %}

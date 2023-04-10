@@ -1,19 +1,22 @@
 from django.shortcuts import render
+from django.http import Http404
+
 from .models import questions 
 from .models import hot_questions
 from .models import tags 
+from .utils import paginate
 
 
 def index(request):
     context = {
-        'questions': questions,
+        'page': paginate(request, questions, 5),
     }
     return render(request, 'index.html', context)
 
 
 def hot(request):
     context = {
-        'questions': hot_questions,
+        'page': paginate(request, hot_questions, 5),
     }
     return render(request, 'index.html', context)
 
@@ -21,14 +24,19 @@ def hot(request):
 def tag(request, tag_name):
     context = {
         'tag': tags[tag_name],
-        'questions': questions,
+        'page': paginate(request, questions, 5)
     }
     return render(request, 'tag.html', context)
 
 
 def question(request, question_id):
+    try:
+        questions[question_id]
+    except:
+        raise Http404("Question not found")
+        
     context = {
-        'question': questions[question_id] # handle errors
+        'question': questions[question_id]
     }
     return render(request, 'question.html', context)
 

@@ -1,0 +1,11 @@
+<nav>
+  <ul class="pagination">
+    {% for i in page.elided_range %}
+      <li class="page-item {% if page.obj.number == i %} active {% endif %}">
+        <a class="page-link" {% if page.ellipsis != i %} href="?page={{ i }}" {% endif %}>
+          {{ i }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>
