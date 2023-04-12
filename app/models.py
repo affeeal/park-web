@@ -2,6 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+def question_key(question):
+    likes = QuestionLike.objects.filter(question=question)
+    rating = 0
+    for like in likes:
+        if like.vote==True:
+            rating+= 1
+        elif like.vote==False:
+            rating-=1
+    return rating
 
 class QuestionManager(models.Manager):
     def by_tag(self, name):
@@ -11,7 +20,8 @@ class QuestionManager(models.Manager):
         return self.order_by("time")
 
     def hot(self):
-        pass
+        global question_key
+        return sorted(self.all(), key=question_key, reverse=True)
 
 
 class Question(models.Model):
@@ -20,12 +30,11 @@ class Question(models.Model):
     title = models.TextField(max_length=150)
     text = models.TextField(max_length=15000)
     tags = models.ManyToManyField("Tag", blank=True)
-
+    
     objects = QuestionManager()
 
     def __str__(self):
         return self.title
-
 
 
 class Answer(models.Model):
@@ -39,11 +48,15 @@ class Answer(models.Model):
 
 class TagManager(models.Manager):
     def popular(self):
-        pass # TODO
+        def popular_key(tag):
+            return Question.objects.filter(tags__name=tag.name).count()
+        return sorted(self.all(), key=popular_key, reverse=True)[:10]
 
 
 class Tag(models.Model):
     name = models.CharField(max_length=15)
+
+    objects = TagManager()
 
     def __str__(self):
         return self.name
@@ -51,7 +64,16 @@ class Tag(models.Model):
 
 class ProfileManager(models.Manager):
     def best(self):
-        pass # TODO
+        def best_key(profile):
+            answers=Answer.objects.filter(user=profile.user)
+            likes=AnswerLike.objects.filter(answer__in=answers)
+            rating=0
+            for like in likes:
+                if like.correct==True:
+                    rating+=1
+            return rating
+        return sorted(self.all(), key=best_key, reverse=True)[:10]
+        
 
 
 class Profile(models.Model):
@@ -59,6 +81,8 @@ class Profile(models.Model):
     avatar = models.FileField(
         upload_to="uploads/",
         default="static/img/avatar.png")
+    
+    objects = ProfileManager()
 
 
 class Like(models.Model):
@@ -73,3 +97,7 @@ class QuestionLike(Like):
 class AnswerLike(Like):
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
     correct = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.answer.text
+
