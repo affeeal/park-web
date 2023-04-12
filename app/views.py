@@ -1,30 +1,27 @@
 from django.shortcuts import render
 from django.http import Http404
-
-from .models import questions 
-from .models import hot_questions
-from .models import tags 
 from .utils import paginate
+from . import models
 
 
 def index(request):
     context = {
-        'page': paginate(request, questions, 5),
+        'page': paginate(request, models.Question.objects.new(), 5),
     }
     return render(request, 'index.html', context)
 
 
 def hot(request):
     context = {
-        'page': paginate(request, hot_questions, 5),
+        'page': paginate(request, models.Question.objects.hot(), 5),
     }
     return render(request, 'index.html', context)
 
 
 def tag(request, tag_name):
     context = {
-        'tag': tags[tag_name],
-        'page': paginate(request, questions, 5)
+        'tag': tag_name,
+        'page': paginate(request, models.Question.objects.by_tag(tag_name), 5),
     }
     return render(request, 'tag.html', context)
 

@@ -1,8 +1,8 @@
-from .models import popular_tags
-from .models import best_members
+from app.models import Tag, Profile
+
 
 def base(request):
     return {
-        'popular_tags': popular_tags,
-        'best_members': best_members,
+        'popular_tags': Tag.objects.all(), # TODO
+        'best_members': Profile.objects.all(), # TODO
     }
