@@ -14,7 +14,7 @@ def paginate(request, object_list, per_page=5, on_each_side=3, on_ends=2):
     page_number = request.GET.get('page')
     
     if page_number is None or not represents_int(page_number) \
-       or int(page_number) < 1 or int(page_number) > paginator.num_pages:
+       or int(page_number) < 1 or int(page_number) > paginator.num_pages: #type:ignore
         page_number = 1
 
     return {

@@ -5,7 +5,7 @@
 
 {% block content %}
   {% include 'inc/question-full.html' %}
-  {% for answer in question.answers %}
+  {% for answer in answers %}
     {% include 'inc/answer.html' %}
   {% endfor %}
   <form class="mt-5">

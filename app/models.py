@@ -2,55 +2,31 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-def question_key(question):
-    likes = QuestionLike.objects.filter(question=question)
-    rating = 0
-    for like in likes:
-        if like.vote==True:
-            rating+= 1
-        elif like.vote==False:
-            rating-=1
-    return rating
 
-class QuestionManager(models.Manager):
-    def by_tag(self, name):
-        return self.filter(tags__name=name)
+# профили, написавшие больше всего ответов
+class ProfileManager(models.Manager):
+    def best(self):
+        return self.annotate(models.Count('answer')).order_by('-answer__count')[:10]
+        
 
-    def new(self):
-        return self.order_by("time")
-
-    def hot(self):
-        global question_key
-        return sorted(self.all(), key=question_key, reverse=True)
-
-
-class Question(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    time = models.DateTimeField(default=timezone.now)
-    title = models.TextField(max_length=150)
-    text = models.TextField(max_length=15000)
-    tags = models.ManyToManyField("Tag", blank=True)
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # TODO разобраться с аватарками
+    avatar = models.FileField(
+        upload_to="uploads/",
+        default="static/img/avatar.png"
+    )
     
-    objects = QuestionManager()
+    objects = ProfileManager()
 
     def __str__(self):
-        return self.title
+        return self.user.username #type:ignore
 
 
-class Answer(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    text = models.TextField(max_length=15000)
-
-    def __str__(self):
-        return self.text
-
-
+# теги, употреблявшиеся больше всего раз
 class TagManager(models.Manager):
     def popular(self):
-        def popular_key(tag):
-            return Question.objects.filter(tags__name=tag.name).count()
-        return sorted(self.all(), key=popular_key, reverse=True)[:10]
+        return self.annotate(models.Count('question')).order_by('-question__count')[:10]
 
 
 class Tag(models.Model):
@@ -62,42 +38,75 @@ class Tag(models.Model):
         return self.name
 
 
-class ProfileManager(models.Manager):
-    def best(self):
-        def best_key(profile):
-            answers=Answer.objects.filter(user=profile.user)
-            likes=AnswerLike.objects.filter(answer__in=answers)
-            rating=0
-            for like in likes:
-                if like.correct==True:
-                    rating+=1
-            return rating
-        return sorted(self.all(), key=best_key, reverse=True)[:10]
-        
+class QuestionManager(models.Manager):
+    # вопросы с рейтингом и числом ответов
+    def with_details(self):
+        return self.annotate(
+            models.Count('answer', distinct=True)
+        ).annotate(
+            rating=models.Sum('questionlike__value')
+        )
+
+    # вопросы по тегу
+    def by_tag(self, name):
+        return self.with_details().filter(tags__name=name)
+
+    # новейшие вопросы
+    def new(self):
+        return self.with_details().order_by('-time')
+
+    # вопросы с наибольшим рейтингом
+    def hot(self):
+        return self.with_details().order_by('-rating')
 
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.FileField(
-        upload_to="uploads/",
-        default="static/img/avatar.png")
+class Question(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    time = models.DateTimeField(default=timezone.now)
+    title = models.TextField(max_length=150)
+    text = models.TextField(max_length=15000)
+    tags = models.ManyToManyField(Tag, blank=True)
     
-    objects = ProfileManager()
-
-
-class Like(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    vote = models.BooleanField(null=True)
-
-
-class QuestionLike(Like):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    
-
-class AnswerLike(Like):
-    answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
-    correct = models.BooleanField(default=False)
+    objects = QuestionManager()
 
     def __str__(self):
-        return self.answer.text
+        return self.title
 
+
+class AnswerManager(models.Manager):
+    # ответы с рейтингом
+    def with_details(self):
+        return self.annotate(rating=models.Sum('answerlike__value'))
+
+    # ответы на определённый вопрос, отсортировнные по рейтингу
+    def top_by_question(self, question):
+        return self.with_details().filter(question=question).order_by('-rating')
+
+
+class Answer(models.Model):
+    question=models.ForeignKey(Question, on_delete=models.CASCADE)
+    profile=models.ForeignKey(Profile, on_delete=models.CASCADE)
+    text=models.TextField(max_length=15000)
+
+    objects=AnswerManager()
+
+    def __str__(self):
+        return self.question.title #type:ignore
+
+
+class QuestionLike(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    value = models.SmallIntegerField(choices=[(-1, 'down'), (1, 'up')]) #type:ignore
+
+    
+class AnswerLike(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
+    value = models.SmallIntegerField(choices=[(-1, 'down'), (1, 'up')]) #type:ignore
+
+    
+# если существует, значит correct=true
+class AnswerCorrect(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE)

@@ -20,15 +20,17 @@
         <p class="card-text flex-grow-1">{{ answer.text }}</p>
         <div class="row">
           <div class="col-9">
+            {# TODO: разобраться с чекбоксами #}
             <input type="checkbox" class="btn-check" id="answer-checkbox-{{ answer.id }}">
             <label class="btn btn-outline-success" for="answer-checkbox-{{ answer.id }}">
               Correct
             </label>
           </div>
           <div class="col-3 d-flex justify-content-center align-items-center">
+            {# TODO: разобраться с аватарками #}
             <img class="me-2 rounded-circle avatar" src="{% static 'img/avatar.png' %}"
                  alt="avatar">
-            <span>{{ answer.author|truncatechars:10 }}</span>
+            <span>{{ answer.profile.user.username|truncatechars:10 }}</span>
           </div>
         </div>
       </div>

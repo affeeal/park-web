@@ -1,19 +1,19 @@
 from django.shortcuts import render
 from django.http import Http404
-from .utils import paginate
-from app.models import Question, Answer, QuestionLike, AnswerLike, Tag, Profile
+from app.models import Answer, Question, Tag 
+from app.utils import paginate
 
 
 def index(request):
     context = {
-        'page': paginate(request, Question.objects.new(), 5),
+        'page': paginate(request, Question.objects.new()),
     }
     return render(request, 'index.html', context)
 
 
 def hot(request):
     context = {
-        'page': paginate(request, Question.objects.hot(), 5),
+        'page': paginate(request, Question.objects.hot()),
     }
     return render(request, 'index.html', context)
 
@@ -21,19 +21,21 @@ def hot(request):
 def tag(request, tag_name):
     context = {
         'tag': Tag.objects.get(name=tag_name),
-        'page': paginate(request, Question.objects.by_tag(tag_name), 5),
+        'page': paginate(request, Question.objects.by_tag(tag_name)),
     }
     return render(request, 'tag.html', context)
 
 
 def question(request, question_id):
     try:
-        context = {
-            'question': Question.objects.get(id=question_id)
-        }
+        question=Question.objects.with_details().get(pk=question_id)
     except IndexError:
         raise Http404("Question does not exist")
     else:
+        context={
+            'question': question,
+            'answers': Answer.objects.top_by_question(question), #type:ignore
+        }
         return render(request, 'question.html', context)
 
 

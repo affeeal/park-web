@@ -19,7 +19,7 @@
         </label>
         {% block question-answers %}
           <a class="mt-3 card-link link-secondary" href="{% url 'question' question.id %}">
-            {{ question.answers|length }} answers
+            {{ question.answer__count }} answers
           </a>
         {% endblock %}
       </div>
@@ -43,9 +43,10 @@
             {% endfor %}
           </div>
           <div class="col-3 d-flex justify-content-center align-items-center">
+            {# TODO: разобраться с аватарками #}
             <img class="me-2 rounded-circle avatar" src="{% static 'img/avatar.png' %}"
                  alt="avatar">
-            <span>{{ question.user.username|truncatechars:10 }}</span>
+            <span>{{ question.profile.user.username|truncatechars:10 }}</span>
           </div>
         </div>
       </div>
