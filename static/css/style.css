@@ -1,0 +1,16 @@
+.logo {
+  height: 30px;
+  width: 30px;
+}
+
+.avatar {
+  height: 30px;
+  width: 30px;
+  object-fit: cover;
+}
+
+.avatar-lg {
+  height: 120px;
+  width: 120px;
+  object-fit: cover;
+}

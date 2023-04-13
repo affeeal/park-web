@@ -1,0 +1,57 @@
+{% extends 'inc/base.html' %}
+{% load static %}
+
+{% block title %} Settings {% endblock %}
+
+{% block authorization %}
+  {% include 'inc/authorized.html' %}
+{% endblock %}
+
+{% block content %}
+  <h2>Settings</h2>
+  <form class="mt-3">
+    <div class="row">
+      <div class="col-3">
+        <label for="login" class="col-form-label">Login</label>
+      </div>
+      <div class="col-6">
+        <input class="form-control" id="login" type="text" size="40"
+               maxlength="40" value="affeeal" autocomplete="off" required> 
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-3">
+        <label for="email" class="col-form-label">Email</label>
+      </div>
+      <div class="col-6">
+        <input class="form-control" id="email" type="email" size="40"
+               maxlength="40" value="affeeal@ya.ru" autocomplete="email" required> 
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-3">
+        <label for="nickname" class="col-form-label">Nickname</label>
+      </div>
+      <div class="col-6">
+        <input class="form-control" id="nickname" type="text" size="40"
+               maxlength="40" value="Ilya Afanasyev" autocomplete="off" required> 
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-3">
+        <label for="settings-avatar" class="form-label">Upload avatar</label>
+      </div>
+      <div class="col-6">
+        <img src="{% static 'img/avatar.png' %}" alt="avatar"
+             class="d-block rounded-circle avatar-lg">
+        <input class="form-control mt-2" type="file" id="settings-avatar"
+               autocomplete="off">
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-6 offset-3">
+        <button class="btn btn-success" type="submit">Save settings</button>
+      </div>
+    </div>
+  </form>
+{% endblock %}

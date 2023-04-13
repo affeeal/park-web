@@ -1,0 +1,14 @@
+{% extends "inc/base.html" %}
+
+{% block title %} Questions {% endblock %}
+
+{% block content %}
+  <div class="mb-4">
+    <h2 class="d-inline">New questions</h2>
+    <a class="ms-4" href="{% url 'hot' %}">hot questions</a>
+  </div>
+  {% for question in page.obj %}
+    {% include 'inc/question.html' %}
+  {% endfor %}
+  {% include 'inc/pagination.html' %}
+{% endblock %}
