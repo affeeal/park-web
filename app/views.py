@@ -1,5 +1,7 @@
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
+from django.forms import model_to_dict
 from django.shortcuts import redirect, render
 from django.http import Http404
 from django.urls import reverse
@@ -8,6 +10,7 @@ from app.models import Answer, Profile, Question, Tag
 from app.utils import paginate
 
 
+@require_http_methods(['GET', 'POST'])
 def index(request):
     context = {
         'page': paginate(request, Question.objects.newest()),
@@ -15,6 +18,7 @@ def index(request):
     return render(request, 'index.html', context)
 
 
+@require_http_methods(['GET', 'POST'])
 def hot(request):
     context = {
         'page': paginate(request, Question.objects.hottest()),
@@ -22,6 +26,7 @@ def hot(request):
     return render(request, 'index.html', context)
 
 
+@require_http_methods(['GET', 'POST'])
 def tag(request, tag_name):
     context = {
         'tag': Tag.objects.get(name=tag_name),
@@ -31,6 +36,7 @@ def tag(request, tag_name):
 
 
 @login_required
+@require_http_methods(['GET', 'POST'])
 def question(request, question_id):
     try:
         question = Question.objects.with_details().get(pk=question_id)
@@ -57,6 +63,7 @@ def question(request, question_id):
         return render(request, 'question.html', context)
 
 
+@require_http_methods(['GET', 'POST'])
 def login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -75,33 +82,34 @@ def login(request):
 
 
 @login_required
+@require_http_methods(['GET', 'POST'])
 def logout(request):
     auth.logout(request)
     return redirect(request.GET.get('next'))
 
 
+@require_http_methods(['GET', 'POST'])
 def signup(request):
     if request.method == 'POST':
-        form = SignupForm(request.POST)
+        form = SignupForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save()
-            user.refresh_from_db()
-            user.profile.nickname = form.cleaned_data.get('nickname')
-            # TODO: загрузка аватара
-            user.save()
+            form.save()
             user = auth.authenticate(
-                username=user.username,
-                password=form.cleaned_data.get('password1')
+                username=form.cleaned_data.get('username'),
+                password=form.cleaned_data.get('password1'),
             )
-            # user is not None
-            auth.login(request, user)
+            auth.login(request, user) # user is not None
             return redirect(reverse('index'))
     else:
         form = SignupForm()
-    return render(request, 'signup.html', {'form': form})
+    context = {
+        'form': form,
+    }
+    return render(request, 'signup.html', context)
 
 
 @login_required
+@require_http_methods(['GET', 'POST'])
 def ask(request):
     if request.method == 'POST':
         form = AskForm(request.POST)
@@ -122,22 +130,14 @@ def ask(request):
 
 
 @login_required
+@require_http_methods(['GET', 'POST'])
 def settings(request):
     if request.method == 'POST':
-        # обновляем данные для user и ассоциированного с ним profile
-        form = SettingsForm(request.POST, instance=request.user)
+        form = SettingsForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
-            user = form.save()
-            user.profile.nickname = form.cleaned_data.get('nickname')
-            # TODO: аватар
-            user.profile.save()
+            form.save()
     else:
-        form = SettingsForm(initial={
-            'username': request.user.username,
-            'nickname': Profile.objects.by_user(request.user).nickname,
-            'email': request.user.email,
-            # TODO: аватар
-        })
+        form = SettingsForm(initial=model_to_dict(request.user))
     context = {
         'form': form,
     }

@@ -18,8 +18,8 @@ class ProfileManager(models.Manager):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.FileField(default="static/img/avatar.png")
-    nickname = models.TextField(max_length=80)
+    avatar = models.ImageField(blank=True, null=True, default='avatar.png',
+                               upload_to='avatars/%Y/%m/%d/')
     
     objects = ProfileManager()
 

@@ -43,10 +43,12 @@
             {% endfor %}
           </div>
           <div class="col-3 d-flex justify-content-center align-items-center">
-            {# TODO: разобраться с аватарками #}
-            <img class="me-2 rounded-circle avatar" src="{% static 'img/avatar.png' %}"
-                 alt="avatar">
-            <span>{{ question.profile.user.username|truncatechars:10 }}</span>
+            <img class="me-2 rounded-circle avatar"
+                 src="{{ question.profile.avatar.url }}" alt="avatar">
+            <span>
+              {{ question.profile.user.first_name }}
+              {{ question.profile.user.last_name }}
+            </span>
           </div>
         </div>
       </div>

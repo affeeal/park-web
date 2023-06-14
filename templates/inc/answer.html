@@ -21,16 +21,20 @@
         <div class="row">
           <div class="col-9">
             {# TODO: разобраться с чекбоксами #}
-            <input type="checkbox" class="btn-check" id="answer-checkbox-{{ answer.id }}">
-            <label class="btn btn-outline-success" for="answer-checkbox-{{ answer.id }}">
+            <input type="checkbox" class="btn-check"
+                   id="answer-checkbox-{{ answer.id }}">
+            <label class="btn btn-outline-success"
+                   for="answer-checkbox-{{ answer.id }}">
               Correct
             </label>
           </div>
           <div class="col-3 d-flex justify-content-center align-items-center">
-            {# TODO: разобраться с аватарками #}
-            <img class="me-2 rounded-circle avatar" src="{% static 'img/avatar.png' %}"
-                 alt="avatar">
-            <span>{{ answer.profile.user.username|truncatechars:10 }}</span>
+            <img class="me-2 rounded-circle avatar"
+                 src="{{ answer.profile.avatar.url }}" alt="avatar">
+            <span>
+              {{ answer.profile.user.first_name}}
+              {{ answer.profile.user.last_name }}
+            </span>
           </div>
         </div>
       </div>

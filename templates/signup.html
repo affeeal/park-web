@@ -7,7 +7,8 @@
 {% block content %}
   <h2>Sign up</h2>
   {% bootstrap_form_errors form %}
-  <form action="{% url 'signup' %}?next={{ request.GET.next }}" method="post">
+  <form action="{% url 'signup' %}?next={{ request.GET.next }}" method="post"
+        enctype="multipart/form-data">
     {% csrf_token %}
     {% for field in form %}
       {% bootstrap_field field layout="horizontal" %}

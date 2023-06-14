@@ -8,7 +8,8 @@
 {% block content %}
   <h2>Settings</h2>
   {% bootstrap_form_errors form %}
-  <form action="{% url 'settings' %}" method="post">
+  <form action="{% url 'settings' %}" method="post"
+        enctype="multipart/form-data">
     {% csrf_token %}
     {% for field in form %}
       {% bootstrap_field field layout="horizontal" %}
