@@ -1,68 +1,17 @@
 {% extends 'inc/base.html' %}
 
+{% load bootstrap5 %}
+
 {% block title %} Sign up {% endblock %}
 
 {% block content %}
   <h2>Sign up</h2>
-  <p class="text-danger mt-3"></p>
-  <form class="mt-3">
-    <div class="row">
-      <div class="col-3">
-        <label for="login" class="col-form-label">Login</label>
-      </div>
-      <div class="col-6">
-        <input class="form-control" id="login" type="text" size="40"
-               maxlength="40" autocomplete="off" required> 
-      </div>
-    </div>
-    <div class="row mt-3">
-      <div class="col-3">
-        <label for="email" class="col-form-label">Email</label>
-      </div>
-      <div class="col-6">
-        <input class="form-control" id="email" type="email" size="40"
-               maxlength="40" autocomplete="email" required> 
-      </div>
-    </div>
-    <div class="row mt-3">
-      <div class="col-3">
-        <label for="nickname" class="col-form-label">Nickname</label>
-      </div>
-      <div class="col-6">
-        <input class="form-control" id="nickname" type="text" size="40"
-               maxlength="40" autocomplete="off" required> 
-      </div>
-    </div>
-    <div class="row mt-3">
-      <div class="col-3">
-        <label for="password" class="col-form-label">Password</label>
-      </div>
-      <div class="col-6">
-        <input class="form-control" id="password" type="password" size="40"
-               maxlength="40" autocomplete="new-password" required>
-      </div>
-    </div>
-    <div class="row mt-3">
-      <div class="col-3">
-        <label for="repeat-password" class="col-form-label">Repeat password</label>
-      </div>
-      <div class="col-6">
-        <input class="form-control" id="password" type="password" size="40"
-               maxlength="40" autocomplete="new-password" required>
-      </div>
-    </div>
-    <div class="row mt-3">
-      <div class="col-3">
-        <label for="upload-avatar" class="col-form-label">Upload avatar</label>
-      </div>
-      <div class="col-6">
-        <input class="form-control" id="upload-avatar" type="file" autocomplete="off">
-      </div>
-    </div>
-    <div class="row mt-3">
-      <div class="col-6 offset-3">
-        <button class="btn btn-success" type="submit">Sign up</button>
-      </div>
-    </div>
+  {% bootstrap_form_errors form %}
+  <form action="{% url 'signup' %}?next={{ request.GET.next }}" method="post">
+    {% csrf_token %}
+    {% for field in form %}
+      {% bootstrap_field field layout="horizontal" %}
+    {% endfor %}
+    {% bootstrap_button "Sign up" button_type="submit" %}
   </form>
 {% endblock %}
