@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.db.models.functions import Coalesce
+from django.contrib.auth.models import AnonymousUser, User
 from django.dispatch import receiver
 from django.utils import timezone
 
@@ -7,13 +8,9 @@ from django.utils import timezone
 class ProfileManager(models.Manager):
     # профили, написавшие больше всего ответов
     def best(self):
-        return self.annotate(models.Count('answer')) \
-                   .order_by('-answer__count')[:10]
-
-    # user, ассоциированный с данным профилем
-    def by_user(self, user):
-        profile = self.filter(user=user)[0]
-        return profile
+        return self.annotate(
+            models.Count('answer')
+        ).order_by('-answer__count')[:10]
         
 
 class Profile(models.Model):
@@ -37,8 +34,9 @@ def update_user_profile(sender, instance, created, **kwargs):
 class TagManager(models.Manager):
     # теги, употреблявшиеся больше всего раз
     def popular(self):
-        return self.annotate(models.Count('question')) \
-                   .order_by('-question__count')[:10]
+        return self.annotate(
+            models.Count('question')
+        ).order_by('-question__count')[:10]
 
 
 class Tag(models.Model):
@@ -52,24 +50,47 @@ class Tag(models.Model):
 
 class QuestionManager(models.Manager):
     # вопросы с рейтингом и числом ответов
-    def with_details(self):
-        return self.annotate(
-            models.Count('answer', distinct=True)
-        ).annotate(
-            rating=models.Sum('questionlike__value')
+    def with_details(self, user):
+        votes = QuestionLike.objects.filter( #type:ignore
+            question=models.OuterRef('pk')
         )
 
+        all_votes = votes.values('question').annotate(
+            value_sum=models.Sum('value')
+        ).values('value_sum')[:1]
+
+        questions = self.annotate(
+            models.Count('answer', distinct=True),
+            rating=Coalesce(models.Subquery(all_votes), 0),
+        )
+
+        if isinstance(user, AnonymousUser):
+            return questions
+        else:
+            logged_in_user_votes = votes.filter(
+                profile=user.profile,
+            ).values('question').annotate(
+                value_sum=models.Sum('value')
+            ).values('value_sum')[:1]
+            
+            return questions.annotate(
+                logged_in_user_vote=Coalesce(
+                    models.Subquery(logged_in_user_votes),
+                    0,
+                )
+            )
+        
     # вопросы по тегу
-    def by_tag(self, name):
-        return self.with_details().filter(tags__name=name)
+    def by_tag(self, user, tag_name):
+        return self.with_details(user).filter(tags__name=tag_name)
 
     # новейшие вопросы
-    def newest(self):
-        return self.with_details().order_by('-time')
+    def newest(self, user):
+        return self.with_details(user).order_by('-time')
 
     # вопросы с наибольшим рейтингом
-    def hottest(self):
-        return self.with_details().order_by('-rating')
+    def hottest(self, user):
+        return self.with_details(user).order_by('-rating')
 
 
 class Question(models.Model):
@@ -87,12 +108,38 @@ class Question(models.Model):
 
 class AnswerManager(models.Manager):
     # ответы с рейтингом
-    def with_details(self):
-        return self.annotate(rating=models.Sum('answerlike__value'))
+    def with_details(self, user):
+        votes = AnswerLike.objects.filter( #type:ignore
+            answer=models.OuterRef('pk')
+        )
+
+        all_votes = votes.values('answer').annotate(
+            value_sum=models.Sum('value')
+        ).values('value_sum')[:1]
+
+        answers = self.annotate(
+            rating=Coalesce(models.Subquery(all_votes), 0),
+        )
+
+        if isinstance(user, AnonymousUser):
+            return answers
+        else:
+            logged_in_user_votes = votes.filter(
+                profile=user.profile,
+            ).values('answer').annotate(
+                value_sum=models.Sum('value')
+            ).values('value_sum')[:1]
+            
+            return answers.annotate(
+                logged_in_user_vote=Coalesce(
+                    models.Subquery(logged_in_user_votes),
+                    0,
+                )
+            )
 
     # ответы на определённый вопрос, отсортировнные по рейтингу
-    def top_by_question(self, question):
-        return self.with_details().filter(question=question) \
+    def top_by_question(self, user, question):
+        return self.with_details(user).filter(question=question) \
                    .order_by('-rating')
 
 
@@ -112,12 +159,20 @@ class QuestionLike(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     value = models.SmallIntegerField(choices=[(-1, 'down'), (1, 'up')]) #type:ignore
 
+    def __str__(self):
+        return ('up' if (self.value == 1) else 'down') \
+            + ' from ' + self.profile.user.username \
+            + ' to question #' + str(self.question.pk) #type:ignore
     
 class AnswerLike(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
     value = models.SmallIntegerField(choices=[(-1, 'down'), (1, 'up')]) #type:ignore
 
+    def __str__(self):
+        return ('up' if (self.value == 1) else 'down') \
+            + ' from ' + self.profile.user.username \
+            + ' to answer #' + str(self.answer.pk) #type:ignore
     
 # если существует, значит correct=true
 class AnswerCorrect(models.Model):

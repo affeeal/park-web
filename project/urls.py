@@ -31,6 +31,8 @@ urlpatterns = [
     path('ask/', views.ask, name='ask'),
     path('settings/', views.settings, name='settings'),
     path('admin/', admin.site.urls),
+    path('question_vote/', views.question_vote, name='question_vote'),
+    path('answer_vote/', views.answer_vote, name='answer_vote'),
 ]
 
 if DEBUG:

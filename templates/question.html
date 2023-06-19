@@ -18,3 +18,8 @@
     {% bootstrap_button "OK" button_type="submit" %}
   </form>
 {% endblock %}
+
+{% block extra_scripts %}
+  <script src="{% static "js/jquery-3.7.0.min.js" %}"></script>
+  <script src="{% static "js/main.js" %}"></script>
+{% endblock %}

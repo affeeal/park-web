@@ -1,36 +1,38 @@
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST, require_GET
 from django.forms import model_to_dict
 from django.shortcuts import redirect, render
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.urls import reverse
 from app.forms import AnswerForm, AskForm, LoginForm, SettingsForm, SignupForm
-from app.models import Answer, Profile, Question, Tag 
+from app.models import Answer, AnswerLike, Question, QuestionLike, Tag 
 from app.utils import paginate
 
 
-@require_http_methods(['GET', 'POST'])
+@require_GET
 def index(request):
     context = {
-        'page': paginate(request, Question.objects.newest()),
+        'page': paginate(request, Question.objects.newest(request.user))
     }
     return render(request, 'index.html', context)
 
 
-@require_http_methods(['GET', 'POST'])
+@require_GET
 def hot(request):
     context = {
-        'page': paginate(request, Question.objects.hottest()),
+        'page': paginate(request, Question.objects.hottest(request.user)),
     }
     return render(request, 'index.html', context)
 
 
-@require_http_methods(['GET', 'POST'])
+@require_GET
 def tag(request, tag_name):
     context = {
         'tag': Tag.objects.get(name=tag_name),
-        'page': paginate(request, Question.objects.by_tag(tag_name)),
+        'page': paginate(
+            request, Question.objects.by_tag(request.user, tag_name)
+        ),
     }
     return render(request, 'tag.html', context)
 
@@ -39,7 +41,8 @@ def tag(request, tag_name):
 @require_http_methods(['GET', 'POST'])
 def question(request, question_id):
     try:
-        question = Question.objects.with_details().get(pk=question_id)
+        question = Question.objects.with_details(request.user) \
+                           .get(pk=question_id)
     except IndexError:
         raise Http404("Question does not exist")
     else:
@@ -49,7 +52,7 @@ def question(request, question_id):
                 # TODO: ситуация, когда отвечает неавторизованный пользователь
                 Answer.objects.create(
                     question=question,
-                    profile=Profile.objects.by_user(request.user),
+                    profile=request.user.profile,
                     text=form.cleaned_data.get('text'),
                 )
                 return redirect(reverse('question', args=[question_id]))
@@ -57,7 +60,7 @@ def question(request, question_id):
             form = AnswerForm()
         context = {
             'question': question,
-            'answers': Answer.objects.top_by_question(question), #type:ignore
+            'answers': Answer.objects.top_by_question(request.user, question),
             'form': form,
         }
         return render(request, 'question.html', context)
@@ -115,7 +118,7 @@ def ask(request):
         form = AskForm(request.POST)
         if form.is_valid():
             question = Question.objects.create(
-                profile=Profile.objects.by_user(request.user),
+                profile=request.user.profile,
                 title=form.cleaned_data.get('title'),
                 text=form.cleaned_data.get('text'),
                 # TODO: теги
@@ -143,3 +146,76 @@ def settings(request):
     }
     return render(request, 'settings.html', context)
 
+@login_required
+@require_POST
+def question_vote(request):
+    try:
+        question_id = int(request.POST.get('question_id'))
+        question_vote = int(request.POST.get('question_vote'))
+    except ValueError:
+        return JsonResponse({}) # TODO
+    
+    try:
+        question = Question.objects.get(pk=question_id)
+    except Question.DoesNotExist: #type:ignore
+        return JsonResponse({}) # TODO
+    
+    try:
+        question_like = QuestionLike.objects.get( #type:ignore
+            profile=request.user.profile,
+            question=question,
+        )
+        
+        if question_like.value != question_vote:
+            question_like.value = question_vote
+            question_like.save()
+        else:
+            question_like.delete()
+    except QuestionLike.DoesNotExist: #type:ignore
+        QuestionLike.objects.create( #type:ignore
+            profile=request.user.profile,
+            question=question,
+            value=question_vote,
+        )
+        
+    return JsonResponse({
+        'rating': Question.objects.with_details(request.user)
+                          .get(pk=question_id).rating
+    })
+    
+@login_required
+@require_POST
+def answer_vote(request):
+    try:
+        answer_id = int(request.POST.get('answer_id'))
+        answer_vote = int(request.POST.get('answer_vote'))
+    except ValueError:
+        return JsonResponse({}) # TODO
+    
+    try:
+        answer = Answer.objects.get(pk=answer_id)
+    except Answer.DoesNotExist: #type:ignore
+        return JsonResponse({}) # TODO
+    
+    try:
+        answer_like = AnswerLike.objects.get( #type:ignore
+            profile=request.user.profile,
+            answer=answer,
+        )
+        
+        if answer_like.value != answer_vote:
+            answer_like.value = answer_vote
+            answer_like.save()
+        else:
+            answer_like.delete()
+    except AnswerLike.DoesNotExist: #type:ignore
+        AnswerLike.objects.create( #type:ignore
+            profile=request.user.profile,
+            answer=answer,
+            value=answer_vote,
+        )
+        
+    return JsonResponse({
+        'rating': Answer.objects.with_details(request.user)
+                          .get(pk=answer_id).rating
+    })
