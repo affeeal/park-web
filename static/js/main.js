@@ -71,3 +71,21 @@ $(".answer-vote").on('click', function (e) {
     )
   );
 });
+
+$(".answer-correct").on('click', function (e) {
+  const id = $(this).data('id');
+  
+  const request = new Request(
+    'http://0.0.0.0:8000/answer_correct/',
+    {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      },
+      body: 'answer_id=' + id,
+    },
+  );
+
+  fetch(request);
+});

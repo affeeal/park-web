@@ -8,7 +8,7 @@
                name="answer-vote-{{ answer.id }}"
                id="answer-vote-up-{{ answer.id }}"
                data-id="{{ answer.id }}" data-vote="1"
-               {% if answer.logged_in_user_vote == 1 %} checked {% endif %}>
+               {% if answer.user_vote == 1 %} checked {% endif %}>
         <label class="btn btn-outline-secondary"
                for="answer-vote-up-{{ answer.id }}">
           <img src="{% static 'img/chevron-up.svg' %}" alt="vote up">
@@ -20,7 +20,7 @@
                name="answer-vote-{{ answer.id }}"
                id="answer-vote-down-{{ answer.id }}"
                data-id="{{ answer.id }}" data-vote="-1"
-               {% if answer.logged_in_user_vote == -1 %} checked {% endif %}>
+               {% if answer.user_vote == -1 %} checked {% endif %}>
         <label class="btn btn-outline-secondary"
                for="answer-vote-down-{{ answer.id }}">
           <img src="{% static 'img/chevron-down.svg' %}" alt="vote down">
@@ -30,13 +30,16 @@
         <p class="card-text flex-grow-1">{{ answer.text }}</p>
         <div class="row">
           <div class="col-9">
-            {# TODO: разобраться с чекбоксами #}
-            <input type="checkbox" class="btn-check"
-                   id="answer-checkbox-{{ answer.id }}">
-            <label class="btn btn-outline-success"
-                   for="answer-checkbox-{{ answer.id }}">
-              Correct
-            </label>
+            {% if is_author %}
+              <input type="checkbox" class="btn-check answer-correct"
+                     id="answer-checkbox-{{ answer.id }}"
+                     data-id="{{ answer.id }}"
+                     {% if answer.correct %} checked {% endif %}>
+              <label class="btn btn-outline-success"
+                     for="answer-checkbox-{{ answer.id }}">
+                Correct
+              </label>
+            {% endif %}
           </div>
           <div class="col-3 d-flex justify-content-center align-items-center">
             <img class="me-2 rounded-circle avatar"

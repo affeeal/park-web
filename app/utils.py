@@ -10,7 +10,6 @@ def represents_int(number):
 
 
 def paginate(request, object_list, per_page=5, on_each_side=3, on_ends=2):
-    print(object_list)
     paginator = Paginator(object_list, per_page)
     page_number = request.GET.get('page')
     

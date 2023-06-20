@@ -107,46 +107,47 @@ class Question(models.Model):
 
 
 class AnswerManager(models.Manager):
-    # ответы с рейтингом
-    def with_details(self, user):
+    def with_details(self, user, question):
         votes = AnswerLike.objects.filter( #type:ignore
             answer=models.OuterRef('pk')
         )
 
-        all_votes = votes.values('answer').annotate(
+        ratings = votes.values('answer').annotate(
             value_sum=models.Sum('value')
         ).values('value_sum')[:1]
 
-        answers = self.annotate(
-            rating=Coalesce(models.Subquery(all_votes), 0),
+        answers = self.filter(
+            question=question
+        ).annotate(
+            rating=Coalesce(models.Subquery(ratings), 0),
         )
 
+        # возвращаем ответы, если текущий пользователь не авторизован
         if isinstance(user, AnonymousUser):
             return answers
-        else:
-            logged_in_user_votes = votes.filter(
-                profile=user.profile,
-            ).values('answer').annotate(
-                value_sum=models.Sum('value')
-            ).values('value_sum')[:1]
-            
-            return answers.annotate(
-                logged_in_user_vote=Coalesce(
-                    models.Subquery(logged_in_user_votes),
-                    0,
-                )
-            )
+        
+        # дополняем ответы лайками текущего пользователя
+        user_votes = votes.filter(
+            profile=user.profile,
+        ).values('answer').annotate(
+            value_sum=models.Sum('value')
+        ).values('value_sum')[:1]
+        
+        return answers.annotate(
+            user_vote=Coalesce(models.Subquery(user_votes), 0)
+        )
 
-    # ответы на определённый вопрос, отсортировнные по рейтингу
-    def top_by_question(self, user, question):
-        return self.with_details(user).filter(question=question) \
-                   .order_by('-rating')
+
+    # ответы на вопрос question, отсортированные по rating
+    def top(self, user, question):
+        return self.with_details(user, question).order_by('-rating')
 
 
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     text = models.TextField(max_length=10000)
+    correct = models.BooleanField(default=False) #type:ignore
 
     objects = AnswerManager()
 
@@ -173,8 +174,3 @@ class AnswerLike(models.Model):
         return ('up' if (self.value == 1) else 'down') \
             + ' from ' + self.profile.user.username \
             + ' to answer #' + str(self.answer.pk) #type:ignore
-    
-# если существует, значит correct=true
-class AnswerCorrect(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    answer = models.ForeignKey(Answer, on_delete=models.CASCADE)

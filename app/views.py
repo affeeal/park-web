@@ -41,29 +41,31 @@ def tag(request, tag_name):
 @require_http_methods(['GET', 'POST'])
 def question(request, question_id):
     try:
-        question = Question.objects.with_details(request.user) \
-                           .get(pk=question_id)
+        question = Question.objects.with_details(request.user).get(pk=question_id)
     except IndexError:
         raise Http404("Question does not exist")
+    
+    if request.method == "POST":
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            # TODO: ситуация, когда отвечает неавторизованный пользователь
+            Answer.objects.create(
+                question=question,
+                profile=request.user.profile,
+                text=form.cleaned_data.get('text'),
+            )
+            return redirect(reverse('question', args=[question_id]))
     else:
-        if request.method == "POST":
-            form = AnswerForm(request.POST)
-            if form.is_valid():
-                # TODO: ситуация, когда отвечает неавторизованный пользователь
-                Answer.objects.create(
-                    question=question,
-                    profile=request.user.profile,
-                    text=form.cleaned_data.get('text'),
-                )
-                return redirect(reverse('question', args=[question_id]))
-        else:
-            form = AnswerForm()
-        context = {
-            'question': question,
-            'answers': Answer.objects.top_by_question(request.user, question),
-            'form': form,
-        }
-        return render(request, 'question.html', context)
+        form = AnswerForm()
+
+    context = {
+        'question': question,
+        'is_author': question.profile == request.user.profile,
+        'answers': Answer.objects.top(request.user, question),
+        'form': form,
+    }
+    
+    return render(request, 'question.html', context)
 
 
 @require_http_methods(['GET', 'POST'])
@@ -146,7 +148,6 @@ def settings(request):
     }
     return render(request, 'settings.html', context)
 
-@login_required
 @require_POST
 def question_vote(request):
     try:
@@ -183,7 +184,6 @@ def question_vote(request):
                           .get(pk=question_id).rating
     })
     
-@login_required
 @require_POST
 def answer_vote(request):
     try:
@@ -216,6 +216,25 @@ def answer_vote(request):
         )
         
     return JsonResponse({
-        'rating': Answer.objects.with_details(request.user)
-                          .get(pk=answer_id).rating
+        'rating': Answer.objects.with_details(
+            request.user, answer.question
+        ).get(pk=answer_id).rating
     })
+
+
+@require_POST
+def answer_correct(request):
+    try:
+        answer_id = int(request.POST.get('answer_id'))
+    except ValueError:
+        return
+    
+    try:
+        answer = Answer.objects.get(pk=answer_id)
+    except Answer.DoesNotExist: #type:ignore
+        return
+    
+    answer.correct = not answer.correct
+    answer.save()
+    
+    return

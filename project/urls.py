@@ -33,6 +33,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('question_vote/', views.question_vote, name='question_vote'),
     path('answer_vote/', views.answer_vote, name='answer_vote'),
+    path('answer_correct/', views.answer_correct, name='answer_correct'),
 ]
 
 if DEBUG:
