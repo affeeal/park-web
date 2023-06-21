@@ -4,15 +4,25 @@
   <div class="card-body">
     <div class="row">
       <div class="col-2 d-flex flex-column align-items-center">
-        <input type="radio" class="btn-check" name="answer-vote-{{ answer.id }}"
-               id="answer-vote-up-{{ answer.id }}">
-        <label class="btn btn-light" for="answer-vote-up-{{ answer.id }}">
+        <input type="radio" class="btn-check answer-vote"
+               name="answer-vote-{{ answer.id }}"
+               id="answer-vote-up-{{ answer.id }}"
+               data-id="{{ answer.id }}" data-vote="1"
+               {% if answer.user_vote == 1 %} checked {% endif %}>
+        <label class="btn btn-outline-secondary"
+               for="answer-vote-up-{{ answer.id }}">
           <img src="{% static 'img/chevron-up.svg' %}" alt="vote up">
         </label>
-        <h5 class="m-1">{{ answer.rating }}</h5>
-        <input type="radio" class="btn-check" name="answer-vote-{{ answer.id }}"
-               id="answer-vote-down-{{ answer.id }}">
-        <label class="btn btn-light" for="answer-vote-down-{{ answer.id }}">
+        <h5 id="answer-rating-{{ answer.id }}" class="m-1">
+          {{ answer.rating }}
+        </h5>
+        <input type="radio" class="btn-check answer-vote"
+               name="answer-vote-{{ answer.id }}"
+               id="answer-vote-down-{{ answer.id }}"
+               data-id="{{ answer.id }}" data-vote="-1"
+               {% if answer.user_vote == -1 %} checked {% endif %}>
+        <label class="btn btn-outline-secondary"
+               for="answer-vote-down-{{ answer.id }}">
           <img src="{% static 'img/chevron-down.svg' %}" alt="vote down">
         </label>
       </div>
@@ -20,17 +30,24 @@
         <p class="card-text flex-grow-1">{{ answer.text }}</p>
         <div class="row">
           <div class="col-9">
-            {# TODO: разобраться с чекбоксами #}
-            <input type="checkbox" class="btn-check" id="answer-checkbox-{{ answer.id }}">
-            <label class="btn btn-outline-success" for="answer-checkbox-{{ answer.id }}">
-              Correct
-            </label>
+            {% if is_author %}
+              <input type="checkbox" class="btn-check answer-correct"
+                     id="answer-checkbox-{{ answer.id }}"
+                     data-id="{{ answer.id }}"
+                     {% if answer.correct %} checked {% endif %}>
+              <label class="btn btn-outline-success"
+                     for="answer-checkbox-{{ answer.id }}">
+                Correct
+              </label>
+            {% endif %}
           </div>
           <div class="col-3 d-flex justify-content-center align-items-center">
-            {# TODO: разобраться с аватарками #}
-            <img class="me-2 rounded-circle avatar" src="{% static 'img/avatar.png' %}"
-                 alt="avatar">
-            <span>{{ answer.profile.user.username|truncatechars:10 }}</span>
+            <img class="me-2 rounded-circle avatar"
+                 src="{{ answer.profile.avatar.url }}" alt="avatar">
+            <span>
+              {{ answer.profile.user.first_name}}
+              {{ answer.profile.user.last_name }}
+            </span>
           </div>
         </div>
       </div>

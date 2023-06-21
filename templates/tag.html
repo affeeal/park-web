@@ -1,5 +1,7 @@
 {% extends 'inc/base.html' %}
 
+{% load static %}
+
 {% block title %} Tag {% endblock %}
 
 {% block content %}
@@ -11,4 +13,9 @@
     {% include 'inc/question.html' %}
   {% endfor %}
   {% include 'inc/pagination.html' %}
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="{% static "js/jquery-3.7.0.min.js" %}"></script>
+  <script src="{% static "js/main.js" %}"></script>
 {% endblock %}

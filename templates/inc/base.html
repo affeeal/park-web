@@ -6,25 +6,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{% endblock %}</title>
-  <link rel="shortcut icon" type="image/x-icon" href="{% static "img/logo.png" %}">
-  <link rel="stylesheet" href="{% static "css/bootstrap.css" %}">
+  <link rel="shortcut icon" type="image/x-icon"
+        href="{% static "img/logo.png" %}">
+  <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
   <link rel="stylesheet" href="{% static "css/style.css" %}">
 </head>
 <body>
   <nav class="navbar navbar-dark bg-dark mb-4">
-    <div class="container">
+    <div class="container" style="height: 45px;">
       <div class="d-flex align-items-center">
-        <img class="me-2 logo" src="{% static "img/logo-white.png" %}" alt="logo">
-        <a class="navbar-brand" href="{% url 'index' %}">Segmentation <b>fault</b></a>
+        <img class="me-2 logo" src="{% static "img/logo-white.png" %}"
+             alt="logo">
+        <a class="navbar-brand" href="{% url 'index' %}">
+          Segmentation <b>fault</b>
+        </a>
       </div>
       <form class="d-flex" role="search">
         <input class="form-control me-2" type="search" placeholder="Search..."
                aria-label="Search">
         <a class="btn btn-success" href="{% url 'ask' %}">Ask</a>
       </form>
-      {% block authorization %}
+      {% if user.is_authenticated %}
+        {% include 'inc/authorized.html' %}
+      {% else %}
         {% include 'inc/unauthorized.html' %}
-      {% endblock %}
+      {% endif %}
     </div>
   </nav>
   <main class="container">
@@ -55,7 +61,19 @@
         </div>
       </div>
     </div>
+    <footer class="d-flex flex-wrap justify-content-between align-items-center
+                   py-3 my-4 border-top">
+    <div class="col-md-4 d-flex align-items-center">
+      <a href="/" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1">
+        <img class="me-2 logo" src="{% static "img/logo.png" %}" alt="logo">
+      </a>
+      <span class="mb-3 mb-md-0 text-muted">
+        © 2023 Segmentation fault, Inc
+      </span>
+    </div>
+  </footer>
   </main>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js" integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N" crossorigin="anonymous"></script>
+  <script src="{% static "js/bootstrap.bundle.min.js" %}"></script>
+  {% block extra_scripts %}{% endblock %}
 </body>
 </html>
