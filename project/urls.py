@@ -18,7 +18,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 from app import views
-from project.settings import DEBUG, MEDIA_URL, MEDIA_ROOT
+from project.settings import DEBUG, MEDIA_URL, MEDIA_ROOT, STATIC_URL, STATIC_ROOT
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -38,3 +38,4 @@ urlpatterns = [
 
 if DEBUG:
     urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
+    urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)

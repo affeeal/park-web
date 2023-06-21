@@ -74,6 +74,7 @@ class Command(BaseCommand):
                 profile=profiles[random.randint(0, ratio-1)],
                 question=questions[random.randint(0, ratio*10-1)],
                 text=lorem.get_paragraph(count=random.randint(1, 3)),
+                correct=random.randint(0, 1),
             ) for _ in range(ratio*100)
         ]
         models.Answer.objects.bulk_create(answers) #type:ignore
@@ -92,16 +93,3 @@ class Command(BaseCommand):
                 )
             )
         models.AnswerLike.objects.bulk_create(answerlikes) #type:ignore
-
-        answercorrects=[]
-        for _ in range(ratio*100):
-            if random.randint(0, 1)==0: # не храним в базе пустые оценки
-                continue
-            answercorrects.append(
-                models.AnswerCorrect(
-                    profile=profiles[random.randint(0, ratio-1)],
-                    answer=answers[random.randint(0, ratio*100-1)],
-                )
-            )
-        models.AnswerCorrect.objects.bulk_create(answercorrects) #type:ignore
-

@@ -23,7 +23,7 @@ $(".question-vote").on('click', function (e) {
   const vote = $(this).data('vote')
   
   const request = new Request(
-    'http://0.0.0.0:8000/question_vote/',
+    'http://localhost:8000/question_vote/',
     {
       method: 'POST',
       headers: {
@@ -51,7 +51,7 @@ $(".answer-vote").on('click', function (e) {
   const vote = $(this).data('vote')
   
   const request = new Request(
-    'http://0.0.0.0:8000/answer_vote/',
+    'http://localhost:8000/answer_vote/',
     {
       method: 'POST',
       headers: {
@@ -76,7 +76,7 @@ $(".answer-correct").on('click', function (e) {
   const id = $(this).data('id');
   
   const request = new Request(
-    'http://0.0.0.0:8000/answer_correct/',
+    'http://localhost:8000/answer_correct/',
     {
       method: 'POST',
       headers: {
