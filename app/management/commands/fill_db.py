@@ -13,13 +13,18 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         ratio = options['ratio']
-        users = [
-            User(
-                username=f'user{i}',
-                password='password',
-                email=f'user{i}@user{i}.ru',
-            ) for i in range(ratio)
-        ]
+        
+        users = []
+        for i in range(ratio):
+            users.append(
+                User(
+                    username=f'user{i}',
+                    first_name='User',
+                    last_name=f'no. {i}',
+                    email=f'user{i}@user{i}.ru',
+                )
+            ) 
+            users[i].set_password('password')
         User.objects.bulk_create(users)
 
         profiles = [

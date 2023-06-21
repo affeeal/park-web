@@ -1,5 +1,7 @@
 {% extends 'inc/base.html' %}
+
 {% load static %}
+{% load bootstrap5 %}
 
 {% block title %} Question {% endblock %}
 
@@ -8,9 +10,16 @@
   {% for answer in answers %}
     {% include 'inc/answer.html' %}
   {% endfor %}
-  <form class="mt-5">
-    <textarea class="form-control" placeholder="Enter your answer here..."
-              rows="5" required></textarea>
-    <button class="btn btn-success mt-3" type="submit">Answer question</button>
+  {% bootstrap_form_errors form %}
+  <form action="{% url 'question' question.id %}" method="post" class="my-4">
+    {% csrf_token %}
+    {% bootstrap_label "Your answer" label_for="id_text" label_class="h4" %}
+    {% bootstrap_field form.text show_label=False %}
+    {% bootstrap_button "OK" button_type="submit" %}
   </form>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="{% static "js/jquery-3.7.0.min.js" %}"></script>
+  <script src="{% static "js/main.js" %}"></script>
 {% endblock %}

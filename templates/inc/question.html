@@ -4,21 +4,32 @@
   <div class="card-body">
     <div class="row">
       <div class="col-2 d-flex flex-column align-items-center">
-        <input type="radio" class="btn-check" name="question-vote-{{ question.id }}"
-               id="question-vote-up-{{ question.id }}">
-        <label class="btn btn-light" for="question-vote-up-{{ question.id }}">
+        <input type="radio" class="btn-check question-vote"
+               name="question-vote-{{ question.id }}"
+               id="question-vote-up-{{ question.id }}"
+               data-id="{{ question.id }}" data-vote="1"
+               {% if question.logged_in_user_vote == 1 %} checked {% endif %}>
+        <label class="btn btn-outline-secondary"
+               for="question-vote-up-{{ question.id }}">
           <img src="{% static "img/chevron-up.svg" %}" alt="vote up">
         </label>
         {% block question-rating %}
-          <h5 class="m-1">{{ question.rating }}</h5>
+        <h5 class="m-1" id="question-rating-{{ question.id }}">
+          {{ question.rating }}
+        </h5>
         {% endblock %}
-        <input type="radio" class="btn-check" name="question-vote-{{ question.id }}"
-               id="question-vote-down-{{ question.id }}">
-        <label class="btn btn-light" for="question-vote-down-{{ question.id }}">
+        <input type="radio" class="btn-check question-vote"
+               name="question-vote-{{ question.id }}"
+               id="question-vote-down-{{ question.id }}"
+               data-id="{{ question.id }}" data-vote="-1"
+               {% if question.logged_in_user_vote == -1 %} checked {% endif %}>
+        <label class="btn btn-outline-secondary"
+               for="question-vote-down-{{ question.id }}">
           <img src="{% static "img/chevron-down.svg" %}" alt="vote down">
         </label>
         {% block question-answers %}
-          <a class="mt-3 card-link link-secondary" href="{% url 'question' question.id %}">
+          <a class="mt-3 card-link link-secondary"
+             href="{% url 'question' question.id %}">
             {{ question.answer__count }} answers
           </a>
         {% endblock %}
@@ -43,10 +54,12 @@
             {% endfor %}
           </div>
           <div class="col-3 d-flex justify-content-center align-items-center">
-            {# TODO: разобраться с аватарками #}
-            <img class="me-2 rounded-circle avatar" src="{% static 'img/avatar.png' %}"
-                 alt="avatar">
-            <span>{{ question.profile.user.username|truncatechars:10 }}</span>
+            <img class="me-2 rounded-circle avatar"
+                 src="{{ question.profile.avatar.url }}" alt="avatar">
+            <span>
+              {{ question.profile.user.first_name }}
+              {{ question.profile.user.last_name }}
+            </span>
           </div>
         </div>
       </div>

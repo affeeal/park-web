@@ -7,7 +7,9 @@
 {% block question-answers %}{% endblock %}
 
 {% block question-rating %}
-  <h4 class="m-1">{{ question.rating }}</h4>
+  <h4 class="m-1" id="question-rating-{{ question.id }}">
+    {{ question.rating }}
+  </h4>
 {% endblock %}
 
 {% block question-title %}
