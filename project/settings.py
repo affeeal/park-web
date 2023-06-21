@@ -50,10 +50,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8000",
-]
-
 ROOT_URLCONF = 'project.urls'
 
 TEMPLATES = [
@@ -82,10 +78,10 @@ WSGI_APPLICATION = 'project.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
-        "HOST": "db",
+        "NAME": "segfault",
+        "USER": "segfaultuser",
+        "PASSWORD": "password",
+        "HOST": "localhost",
         "PORT": 5432,
     }
 }
